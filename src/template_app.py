@@ -6,13 +6,21 @@ import sys
 import os
 import json
 
+# # Encryption
+# from Crypto.Cipher import AES
+# import os
+# import random
+# import struct
+# import base64
+# import hashlib
 
-def your_python_code(arg, path, output):
+
+def your_python_code(arg, input_path, output_path):
     """
     Paste there your code you want to execute in iExec worker
     """
     # Open input file
-    signal = pd.read_csv(path)
+    signal = pd.read_csv(input_path)
 
     # Run computation
     algo = rpt.Pelt(model="rbf").fit(signal)
@@ -21,9 +29,9 @@ def your_python_code(arg, path, output):
 
     # Save results in output directory
     out_filename = "/results_change_point_detect.pdf"
-    plt.savefig('{}/results_change_point_detect.pdf'.format(output))
+    plt.savefig('{}/results_change_point_detect.pdf'.format(output_path))
 
-    return output + out_filename
+    return output_path + out_filename
 
 # ============================================
 def read_input_parameter(n):
@@ -59,6 +67,39 @@ def handle_input_files():
             with open(file_path) as f:
                 file_list.append(f)
     return file_list
+
+# def encrypt_file(key, filename, chunk_size=64*1024):
+#     output_filename = filename + '.encrypted'
+#     iv = ''.join(chr(random.randint(0, 0xFF)) for i in range(16))
+#     encryptor = AES.new(key, AES.MODE_CBC, iv)
+#     filesize = os.path.getsize(filename)
+#     with open(filename, 'rb') as inputfile:
+#         with open(output_filename, 'wb') as outputfile:
+#             outputfile.write(struct.pack('<Q', filesize))
+#             outputfile.write(iv)
+#             while True:
+#                 chunk = inputfile.read(chunk_size)
+#                 if len(chunk) == 0:
+#                     break
+#                 elif len(chunk) % 16 != 0:
+#                     chunk += ' ' * (16 - len(chunk) % 16)
+#                 outputfile.write(encryptor.encrypt(chunk))
+ 
+
+# def decrypt_file(key, filename, chunk_size=24*1024):
+#     private_key = hashlib.sha256(key.encode("utf-8")).digest()
+#     output_filename = os.path.splitext(filename)[0]
+#     with open(filename, 'rb') as infile:
+#         origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
+#         iv = infile.read(16)
+#         decryptor = AES.new(private_key, AES.MODE_CBC, iv)
+#         with open(output_filename, 'wb') as outfile:
+#             while True:
+#                 chunk = infile.read(chunk_size)
+#                 if len(chunk) == 0:
+#                     break
+#                 outfile.write(decryptor.decrypt(chunk))
+#             outfile.truncate(origsize)
 
 def save_result(result_filepath):
     """
@@ -98,5 +139,8 @@ if __name__ == '__main__':
     # Trigger computation
     result_path = your_python_code(args, filepath, iexec_out)
     save_result(result_path)
+    # key = 'JlVxwk6UiwJTLJVXriHOHHb+y04uDgkiq99ukJsrO/s='
+    # print(key)
+    # # decrypt_file(key, "sample_data/datasets/encrypted/my-first-dataset.txt.enc", chunk_size=24*1024)
 
 
